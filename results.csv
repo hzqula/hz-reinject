@@ -1,0 +1,5 @@
+Contract File,Status,Time Taken
+Bank_Injected.sol,DETECTED,7
+CrowdsaleRefund_Injected.sol,DETECTED,3
+StakingVault_Injected.sol,UNDETECTED,6
+Vault_Injected.sol,DETECTED,4
