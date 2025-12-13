@@ -7,7 +7,7 @@ from modules import performance, inspection
 from modules.bug_injector import BugInjector 
 
 # KONFIGURASI PATH
-INPUT_DIR = "contracts"
+INPUT_DIR = "ready-contracts"
 OUTPUT_DIR = "injected-contracts"
 BUG_FILE = "bugs/reentrancy.txt"
 LOG_DIR = "logs"
