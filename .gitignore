@@ -3,3 +3,4 @@ injected-contracts/*
 ready-contracts/*
 logs/*
 json-logs/*
+*.csv
