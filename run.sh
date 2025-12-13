@@ -3,50 +3,55 @@
 # KONFIGURASI
 INJECT_DIR="injected-contracts"
 RESULT_FILE="results.csv"
-TIMEOUT=120  # Waktu maksimum per kontrak (detik). 120 = 2 menit.
+LOG_DIR="json-logs"
+TIMEOUT=120
+
+# Bersihkan artifact lama agar kompilasi fresh
+rm -rf crytic-export
+mkdir -p $LOG_DIR
 
 # Buat Header CSV
 echo "Contract File,Status,Time Taken" > $RESULT_FILE
 
-echo "[*] Memulai Eksperimen Massal Echidna..."
-echo "[*] Hasil akan disimpan di $RESULT_FILE"
+echo "[*] Memulai Eksperimen (Mode Hybrid Log)..."
 
-# Loop semua file .sol di folder injeksi
 for file in $INJECT_DIR/*.sol; do
     [ -e "$file" ] || continue
     
-    # Ambil nama file dan nama kontrak
     filename=$(basename "$file")
+    # Ambil nama kontrak (asumsi nama kontrak = nama file tanpa .sol agar lebih aman)
+    # Atau gunakan regex contract yang sudah ada
     contract_name=$(grep -oP "contract \K\w+" "$file" | head -1)
-
-    echo "---------------------------------------------------"
-    echo "[*] Testing: $contract_name ($filename)"
     
-    # Jalankan Echidna dengan timeout
-    # Kita cari kata "failed" di output untuk menentukan status
+    # File output kita sebut .json.log karena isinya campuran
+    json_output="$LOG_DIR/${filename}.json"
+
+    echo "==================================================="
+    echo "[*] Target: $contract_name ($filename)"
+    
     start_time=$(date +%s)
     
-    output=$(timeout $TIMEOUT echidna "$file" --contract "$contract_name" 2>&1)
-    exit_code=$?
+    # 1. JALANKAN ECHIDNA
+    # Gunakan --format json tapi simpan sebagai teks biasa
+    timeout $TIMEOUT echidna "$file" --contract "$contract_name" --format json > "$json_output" 2>&1
     
     end_time=$(date +%s)
     duration=$((end_time - start_time))
 
-    # Analisis Hasil
-    if echo "$output" | grep -q "echidna_test_solvency: failed"; then
-        echo "    -> RESULT: DETECTED (FAIL) 💥"
+    # 2. ANALISIS LOG (Pakai script Python baru)
+    python3 analyze_logs.py "$json_output"
+
+    # 3. TENTUKAN STATUS UNTUK CSV
+    # Kita grep kata kunci 'falsified' yang menandakan failure di Echidna
+    if grep -q "falsified" "$json_output"; then
         status="DETECTED"
-    elif echo "$output" | grep -q "echidna_test_solvency: passing"; then
-        echo "    -> RESULT: UNDETECTED (PASS) ❌"
-        status="UNDETECTED"
     else
-        echo "    -> RESULT: ERROR / TIMEOUT ⚠️"
-        status="ERROR"
+        status="UNDETECTED"
     fi
 
-    # Simpan ke CSV
+    # Simpan ke CSV Rekap
     echo "$filename,$status,$duration" >> $RESULT_FILE
 done
 
-echo "---------------------------------------------------"
-echo "[*] Eksperimen Selesai. Cek file $RESULT_FILE"
+echo "==================================================="
+echo "[*] Selesai. Cek file $RESULT_FILE"
