@@ -1,7 +1,7 @@
-contracts/*
-injected-contracts/*
-ready-contracts/*
+crytic-export/
 logs/*
 json-logs/*
 ./*.csv
 echidna-results/*
+injected-contracts/*
+ready-contracts/*
