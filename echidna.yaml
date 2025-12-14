@@ -1,12 +1,9 @@
 # Echidna 2.2.7 Configuration
 # Tested and working configuration
 
-testMode: property
-testLimit: 50000
 seqLen: 100
 shrinkLimit: 5000
 coverage: true
-corpusDir: "corpus"
 format: text
 stopOnFail: false
 timeout: 300
