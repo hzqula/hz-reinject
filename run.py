@@ -55,7 +55,7 @@ class EchidnaRunner:
                 '--format', 'text',  # Changed from json to text for better error visibility
                 '--test-mode', 'property',  # Changed to property mode for echidna_ functions
                 '--corpus-dir', f'{self.output_dir}/corpus_{main_contract}',
-                '--test-limit', '10000'  # Number of test cases
+                '--test-limit', '1000000'  # Number of test cases
             ]
             
             process = subprocess.run(
@@ -73,7 +73,8 @@ class EchidnaRunner:
                 result['status'] = 'DETECTED'
                 result['detected'] = True
                 print(f"  ✓ DETECTED - Echidna found reentrancy vulnerability!")
-            elif 'passed' in process.stdout.lower():
+            # [FIX] Terima 'passing' atau 'passed' sebagai tanda undetected
+            elif 'passed' in process.stdout.lower() or 'passing' in process.stdout.lower():
                 result['status'] = 'UNDETECTED'
                 print(f"  ✗ UNDETECTED - Bug not found")
             else:
@@ -83,7 +84,7 @@ class EchidnaRunner:
             # Save detailed output
             output_file = os.path.join(
                 self.output_dir, 
-                f"{contract_name}.output.json"
+                f"{contract_name}.txt"
             )
             with open(output_file, 'w') as f:
                 f.write(result['output'])
