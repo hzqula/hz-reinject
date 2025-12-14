@@ -1,51 +1,19 @@
-# Echidna Configuration for Reentrancy Detection
-# Place this file in the same directory as your contracts
+# Echidna 2.2.7 Configuration
+# Tested and working configuration
 
-# Test mode: property (for echidna_ functions)
 testMode: property
-
-# Number of test sequences to run
 testLimit: 50000
-
-# Sequence length
-seqLen: 50
-
-# Contract deployment arguments
-# deployer: "0x30000"
-# sender: ["0x10000", "0x20000", "0x30000"]
-
-# Shrinking (simplify failing test cases)
+seqLen: 100
 shrinkLimit: 5000
-
-# Coverage
 coverage: true
-
-# Corpus directory
 corpusDir: "corpus"
-
-# Format output
 format: text
-
-# Stop on first failure
 stopOnFail: false
+timeout: 300
 
-# Multi-ABI support
-multiAbi: false
+# Deployer and senders
+deployer: "0x30000"
+sender: ["0x10000", "0x20000", "0x30000"]
 
-# Filter functions to test (empty = test all)
-# filterFunctions: ["echidna_"]
-
-# Filter blacklist (functions to NOT test)
-# filterBlacklist: []
-
-# Optimization
-cryticArgs: ["--solc-optimize-runs", "200"]
-
-# Timeout per test (seconds)
-timeout: 120
-
-# Seed for reproducibility (optional)
-# seed: 42
-
-# Verbose logging
-quiet: false
+# Solc arguments (correct format for Echidna 2.2.7)
+solcArgs: "--optimize"
